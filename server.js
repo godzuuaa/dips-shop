@@ -54,6 +54,10 @@ const { redeemAngpao, getConfigStatus, validateVoucherFormat } = require('./util
 const { notifyAngpaoRequest, notifyAngpaoResult, testWebhook } = require('./utils/discordNotify');
 
 const app = express();
+
+// Trust proxy for Railway/Render/Vercel (required for rate-limit to work correctly)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
