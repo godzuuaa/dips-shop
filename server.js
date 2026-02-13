@@ -870,39 +870,65 @@ app.post('/api/thunder/verify-slip', requireAuth, async (req, res) => {
         const result = await thunderApi.verifySlip(slipData);
 
         if (result.success) {
-            // ตรวจสอบจำนวนเงินตรงกันหรือไม่
-            if (amount && Math.abs(result.amount - parseFloat(amount)) > 0.01) {
+            const verifiedAmount = result.amount;
+            
+            // ตรวจสอบจำนวนเงินตรงกันหรือไม่ (ถ้าระบุ amount มา)
+            if (amount && Math.abs(verifiedAmount - parseFloat(amount)) > 0.01) {
                 return res.json({
                     success: false,
-                    error: `จำนวนเงินไม่ตรงกัน (Slip: ${result.amount} บาท, คำขอ: ${amount} บาท)`,
-                    slipAmount: result.amount,
+                    error: `จำนวนเงินไม่ตรงกัน (Slip: ${verifiedAmount} บาท, คำขอ: ${amount} บาท)`,
+                    slipAmount: verifiedAmount,
                     requestedAmount: amount
                 });
             }
 
-            // ถ้ามี requestId ให้อัพเดต topup request
+            // ========== เพิ่มเงินให้ User ทันที ==========
+            await getOrCreateWallet(userId);
+            const currentBalance = await getUserBalance(userId);
+            const newBalance = currentBalance + verifiedAmount;
+            await updateUserBalance(userId, newBalance);
+            
+            // บันทึก Transaction
+            await addTransaction(userId, 'topup', verifiedAmount, {
+                method: 'qr_promptpay',
+                transRef: result.transRef,
+                senderName: result.senderName,
+                sendingBank: result.sendingBank,
+                verifiedAt: new Date().toISOString()
+            });
+            
+            // Invalidate balance cache
+            invalidateBalanceCache(userId);
+
+            // ถ้ามี requestId ให้อัพเดต topup request เป็น approved
             if (requestId) {
-                await supabase
+                await supabaseAdmin
                     .from('topup_requests')
                     .update({
-                        status: 'verified',
+                        status: 'approved',
                         slip_ref: result.transRef,
-                        verified_amount: result.amount,
-                        verified_at: new Date().toISOString()
+                        verified_amount: verifiedAmount,
+                        verified_at: new Date().toISOString(),
+                        admin_note: 'อนุมัติอัตโนมัติ (Slip Verified)',
+                        reviewed_at: new Date().toISOString()
                     })
                     .eq('request_id', requestId)
                     .eq('user_id', userId);
             }
+            
+            console.log(`✅ Topup ${verifiedAmount} บาท ให้ ${userId} สำเร็จ (Slip: ${result.transRef})`);
 
             res.json({
                 success: true,
-                amount: result.amount,
+                amount: verifiedAmount,
+                newBalance: newBalance,
                 transRef: result.transRef,
                 senderName: result.senderName,
                 receiverName: result.receiverName,
                 sendingBank: result.sendingBank,
                 receivingBank: result.receivingBank,
-                date: result.date
+                date: result.date,
+                message: `เติมเงิน ${verifiedAmount} บาท สำเร็จ!`
             });
         } else {
             res.json({
