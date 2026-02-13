@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ - Dips Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/components.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #0a1612 50%, #0a0a0a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 22, 18, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #14b8a6;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #a7c4bc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #5eead4;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 100px;
+            padding-bottom: 50px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            background: rgba(10, 22, 18, 0.8);
+            border: 1px solid #1a2f2a;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .profile-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: #5eead4;
+        }
+
+        .profile-info p {
+            color: #a7c4bc;
+            margin-bottom: 15px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #14b8a6;
+        }
+
+        .stat-label {
+            color: #a7c4bc;
+            font-size: 0.85rem;
+        }
+
+        /* Profile Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .profile-card {
+            background: rgba(10, 22, 18, 0.8);
+            border: 1px solid #1a2f2a;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #5eead4;
+        }
+
+        .card-title i {
+            color: #14b8a6;
+        }
+
+        /* Order List */
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(26, 47, 42, 0.3);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .order-info h4 {
+            margin-bottom: 3px;
+            color: #5eead4;
+        }
+
+        .order-info p {
+            color: #a7c4bc;
+            font-size: 0.85rem;
+        }
+
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .order-status.completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .order-status.pending {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+
+        /* Settings */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #1a2f2a;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info h4 {
+            margin-bottom: 3px;
+            color: #5eead4;
+        }
+
+        .setting-info p {
+            color: #a7c4bc;
+            font-size: 0.85rem;
+        }
+
+        .btn-edit {
+            padding: 8px 15px;
+            background: rgba(26, 47, 42, 0.5);
+            border: 1px solid #1a2f2a;
+            border-radius: 8px;
+            color: #a7c4bc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            background: #0d9488;
+            border-color: #0d9488;
+            color: white;
+        }
+
+        /* Logout Button */
+        .btn-logout {
+            width: 100%;
+            padding: 15px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 10px;
+            color: #ef4444;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #5a7a70;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="../index.html" class="nav-brand">Dips Hub</a>
+        <div class="nav-links">
+            <a href="../index.html">หน้าหลัก</a>
+            <a href="store.html">ร้านค้า</a>
+            <a href="topup.html">เติมเงิน</a>
+            <a href="profile.html" class="active">โปรไฟล์</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-info">
+                <h1>DIPSHUB</h1>
+                <p>สมาชิกตั้งแต่ มกราคม 2026</p>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-value">฿0</div>
+                        <div class="stat-label">ยอดเงินคงเหลือ</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">คำสั่งซื้อ</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">สินค้าที่ซื้อ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Grid -->
+        <div class="profile-grid">
+
+            <!-- Recent Orders -->
+            <div class="profile-card">
+                <h3 class="card-title">
+                    <i class="fa-solid fa-shopping-bag"></i>
+                    คำสั่งซื้อล่าสุด
+                </h3>
+                <div class="empty-message">
+                    <i class="fa-solid fa-box-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>ยังไม่มีคำสั่งซื้อ</p>
+                </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="profile-card">
+                <h3 class="card-title">
+                    <i class="fa-solid fa-gear"></i>
+                    ตั้งค่าบัญชี
+                </h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>อีเมล</h4>
+                        <p>user@example.com</p>
+                    </div>
+                    <button class="btn-edit">แก้ไข</button>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>รหัสผ่าน</h4>
+                        <p>••••••••</p>
+                    </div>
+                    <button class="btn-edit">เปลี่ยน</button>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>เชื่อมต่อ Discord</h4>
+                        <p>ยังไม่ได้เชื่อมต่อ</p>
+                    </div>
+                    <button class="btn-edit">เชื่อมต่อ</button>
+                </div>
+
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

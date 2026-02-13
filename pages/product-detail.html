@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดสินค้า - Dips Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+
+    <style>
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .infinity-loader {
+            width: 80px;
+            height: 50px;
+        }
+        .infinity-loader svg {
+            width: 100%;
+            height: 100%;
+        }
+        .infinity-loader path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawInfinity 2s ease-in-out infinite;
+        }
+        @keyframes drawInfinity {
+            0% { stroke-dashoffset: 200; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -200; }
+        }
+        .loading-logo {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+        .loading-logo .dips { color: white; }
+        .loading-logo .hub { color: #14b8a6; }
+        .loading-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #14b8a6, #5eead4);
+            width: 0%;
+            animation: loadProgress 1.5s ease-in-out forwards;
+        }
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('../images/24678.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .bg-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .nav-brand .dips { color: white; }
+        .nav-brand .hub { color: #14b8a6; }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #5eead4;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 50px;
+        }
+
+        .content-wrapper {
+            max-width: 1500px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #5eead4;
+        }
+
+        /* Product Detail Container */
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
+            align-items: stretch;
+        }
+
+        /* Product Image Side */
+        .product-image-section {
+            position: relative;
+            padding: 0;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .product-slider {
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            width: 100%;
+            padding: 38px;
+        }
+
+        .product-slider img,
+        #productImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .slider-dot.active {
+            background: white;
+        }
+
+        /* Product Info Side */
+        .product-info-section {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .product-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .product-price-display {
+            margin-bottom: 20px;
+        }
+
+        .product-price-display .label {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .product-price-display .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .product-price-display .unit {
+            font-size: 1.3rem;
+            color: #22c55e;
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-bottom: 15px;
+        }
+
+        .features-title {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .feature-list li i {
+            color: #22c55e;
+            font-size: 0.9rem;
+        }
+
+        /* Stock Display */
+        .stock-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stock-display i {
+            color: #22c55e;
+            font-size: 1.2rem;
+        }
+
+        .stock-display .stock-text {
+            font-size: 0.95rem;
+        }
+
+        .stock-display .stock-count {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        /* Quantity Selector */
+        .quantity-section {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .quantity-label {
+            font-size: 0.9rem;
+            color: #5eead4;
+            margin-bottom: 10px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            width: 100%;
+        }
+
+        .qty-btn {
+            width: 50px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:first-child {
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+        }
+
+        .qty-btn:last-child {
+            border-radius: 0 8px 8px 0;
+            border-left: none;
+        }
+
+        .qty-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .qty-input {
+            flex: 1;
+            height: 45px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .qty-input:focus {
+            outline: none;
+            border-color: rgba(94, 234, 212, 0.5);
+        }
+
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .stock-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .stock-info .count {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .total-price-display {
+            margin-top: 10px;
+            padding: 12px 15px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .total-price-display .label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .total-price-display .total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn-order {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-order:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-order:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-info {
+            padding: 12px 25px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-info:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Product Details Section */
+        .product-details-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .details-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .details-content {
+            color: rgba(255, 255, 255, 0.85);
+            display: flex;
+            flex-direction: column;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .details-content p {
+            margin: 0;
+        }
+
+        .details-content a {
+            color: #5eead4;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .details-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-info-section {
+                padding: 20px;
+                border-left: none;
+                border-top: 2px solid #14b8a6;
+            }
+
+            .product-slider {
+                min-height: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .content-wrapper {
+                padding: 0 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen" style="display: none;">
+        <div class="infinity-loader">
+            <svg viewBox="0 0 100 50">
+                <path d="M25,25 C25,10 10,10 10,25 C10,40 25,40 25,25 C25,10 40,10 50,25 C60,40 75,40 75,25 C75,10 90,10 90,25 C90,40 75,40 75,25 C75,10 60,10 50,25 C40,40 25,40 25,25" />
+            </svg>
+        </div>
+        <div class="loading-logo">
+            <span class="dips">DIPS</span><span class="hub">HUB</span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            const navEntries = performance.getEntriesByType('navigation');
+            const navType = navEntries.length > 0 ? navEntries[0].type : 'navigate';
+            if (navType === 'reload') {
+                document.getElementById('loadingScreen').style.display = 'flex';
+            }
+        })();
+    </script>
+
+    <!-- Background -->
+    <div class="bg-wrapper">
+        <div class="bg-image"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-gear fa-spin" style="color: #14b8a6; font-size: 1.3rem;"></i>
+            <span><span class="dips">DIPS</span><span class="hub">HUB</span></span>
+        </a>
+        <div class="nav-links">
+            <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/pages/store.html" class="active"><i class="fa-solid fa-store"></i> Store</a>
+            <a href="/pages/topup.html"><i class="fa-regular fa-credit-card"></i> Topup</a>
+            <a href="#"><i class="fa-solid fa-list"></i> Features</a>
+            <a href="#"><i class="fa-solid fa-question"></i> How to</a>
+            <a href="#"><i class="fa-regular fa-newspaper"></i> News</a>
+        </div>
+        <div class="user-profile">
+            <!-- จะถูกอัพเดทโดย auth.js -->
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            
+            <!-- Back Button -->
+            <a href="javascript:history.back()" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                กลับไปหน้าสินค้า
+            </a>
+
+            <!-- Product Detail Container -->
+            <div class="product-detail-container">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="product-slider">
+                        <img id="productImage" src="" alt="Product Image">
+                        <div class="slider-dots">
+                            <span class="slider-dot active"></span>
+                            <span class="slider-dot"></span>
+                            <span class="slider-dot"></span>
+                            <span class="slider-dot"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productName">กำลังโหลด...</h1>
+                    
+                    <div class="product-price-display">
+                        <span class="label">ราคา</span>
+                        <span class="price" id="productPrice">0</span>
+                        <span class="unit">บาท</span>
+                    </div>
+
+                    <div class="features-section">
+                        <h3 class="features-title">ทำไมคนถึงเลือกใช้ของเรา?</h3>
+                        <ul class="feature-list" id="featureList">
+                            <li><i class="fa-solid fa-check"></i> รองรับทั้งมือถือและคอมพิวเตอร์</li>
+                            <li><i class="fa-solid fa-check"></i> ปลอดภัย 100% ไม่เสี่ยงโดนแบน</li>
+                            <li><i class="fa-solid fa-check"></i> มีทีมซัพพอร์ต ช่วยเหลือหากพบปัญหา</li>
+                            <li><i class="fa-solid fa-check"></i> อัปเดตตลอด จนกว่าจะเลิกทำ!</li>
+                            <li><i class="fa-solid fa-check"></i> ซื้อมาแล้วมีคู่มือในการใช้งานให้ครบ</li>
+                        </ul>
+                    </div>
+
+                    <div class="stock-display">
+                        <i class="fa-solid fa-globe"></i>
+                        <span class="stock-text">Stock Available: <span class="stock-count" id="stockCount">0</span> ชิ้น</span>
+                    </div>
+
+                    <!-- Quantity Selector -->
+                    <div class="quantity-section" id="quantitySection">
+                        <div class="quantity-label">Quantity</div>
+                        <div class="quantity-selector">
+                            <button class="qty-btn" onclick="changeQuantity(-1)" id="btnMinus"><i class="fa-solid fa-minus"></i></button>
+                            <input type="number" class="qty-input" id="quantityInput" value="1" min="1" max="100" onchange="validateQuantity()">
+                            <button class="qty-btn" onclick="changeQuantity(1)" id="btnPlus"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="stock-info">Stock: <span class="count" id="stockInQuantity">0</span></div>
+                        <div class="total-price-display">
+                            <span class="label">รวมทั้งหมด:</span>
+                            <span class="total" id="totalPrice">฿0</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-order" id="btnOrder" onclick="buyProduct()">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            สั่งซื้อสินค้านี้!
+                        </button>
+                        <button class="btn-info" onclick="showMoreInfo()">
+                            ดูข้อมูล / รีวิวเพิ่มเติม
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Product Details Section -->
+            <div class="product-details-section">
+                <h2 class="details-title">📦 รายละเอียดสินค้า</h2>
+                <div class="details-content" id="productDetails">
+                    <p>กำลังโหลดข้อมูล...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/sweetalert-config.js"></script>
+    <script>
+        // Product Data
+        let currentProduct = null;
+
+        // Get URL Parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                id: params.get('id'),
+                category: params.get('category')
+            };
+        }
+
+        // Load Product Data
+        async function loadProductData() {
+            const { id, category } = getUrlParams();
+            
+            if (!id) {
+                showError('ไม่พบรหัสสินค้า');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+
+                if (data.success && data.products) {
+                    currentProduct = data.products.find(p => p.product_id === id);
+                    
+                    if (currentProduct) {
+                        renderProduct();
+                    } else {
+                        showError('ไม่พบสินค้านี้');
+                    }
+                }
+            } catch (error) {
+                console.error('Load product error:', error);
+                showError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            }
+        }
+
+        // Render Product
+        function renderProduct() {
+            if (!currentProduct) return;
+
+            document.getElementById('productName').textContent = currentProduct.name;
+            document.getElementById('productPrice').textContent = currentProduct.price.toLocaleString();
+            document.getElementById('stockCount').textContent = currentProduct.stock;
+            document.getElementById('stockInQuantity').textContent = currentProduct.stock;
+            document.getElementById('productImage').src = currentProduct.image || '../images/1.jpg';
+            
+            // Update title
+            document.title = `${currentProduct.name} - Dips Hub`;
+
+            // Update quantity selector max value
+            const qtyInput = document.getElementById('quantityInput');
+            const maxQty = Math.min(currentProduct.stock, 100);
+            qtyInput.max = maxQty;
+            
+            // Validate current quantity doesn't exceed stock
+            if (parseInt(qtyInput.value) > maxQty) {
+                qtyInput.value = maxQty > 0 ? maxQty : 1;
+            }
+            updateTotalPrice();
+            updateQuantityButtons();
+
+            // Update stock color
+            const stockCount = document.getElementById('stockCount');
+            const stockInQty = document.getElementById('stockInQuantity');
+            if (currentProduct.stock === 0) {
+                stockCount.style.color = '#ef4444';
+                stockInQty.style.color = '#ef4444';
+                document.getElementById('btnOrder').disabled = true;
+                document.getElementById('btnOrder').innerHTML = '<i class="fa-solid fa-times"></i> สินค้าหมด';
+                document.getElementById('quantitySection').style.display = 'none';
+            } else if (currentProduct.stock <= 5) {
+                stockCount.style.color = '#f59e0b';
+                stockInQty.style.color = '#f59e0b';
+                document.getElementById('quantitySection').style.display = 'block';
+            } else {
+                stockCount.style.color = '#22c55e';
+                stockInQty.style.color = '#22c55e';
+                document.getElementById('quantitySection').style.display = 'block';
+            }
+
+            // Update description - แสดงข้อความตามที่กรอกจาก admin 100%
+            if (currentProduct.description) {
+                // แปลง URL เป็น link ที่คลิกได้
+                let desc = currentProduct.description;
+                desc = desc.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #5eead4;">$1</a>');
+                document.getElementById('productDetails').innerHTML = desc;
+            }
+        }
+
+        // Buy Product
+        async function buyProduct() {
+            if (!currentProduct) return;
+
+            // Check login
+            try {
+                const res = await fetch('/api/user');
+                const data = await res.json();
+                
+                if (!data.loggedIn) {
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'ต้อง Login ก่อน',
+                        text: 'กรุณาเข้าสู่ระบบก่อนซื้อสินค้า',
+                        confirmButtonColor: '#14b8a6'
+                    });
+                    window.location.href = '/auth/discord';
+                    return;
+                }
+            } catch (error) {
+                console.error('Check login error:', error);
+            }
+
+            // Get quantity
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+            const totalPrice = currentProduct.price * quantity;
+
+            // Validate quantity
+            if (quantity < 1 || quantity > currentProduct.stock) {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'จำนวนไม่ถูกต้อง',
+                    text: `สามารถซื้อได้ 1 - ${currentProduct.stock} ชิ้น`,
+                    confirmButtonColor: '#14b8a6'
+                });
+                return;
+            }
+
+            // Confirm purchase
+            const result = await Swal.fire({
+                title: 'ยืนยันการซื้อ',
+                html: `
+                    <div style="text-align: left; padding: 10px 0;">
+                        <p style="margin-bottom: 10px;"><strong>สินค้า:</strong> ${currentProduct.name}</p>
+                        <p style="margin-bottom: 10px;"><strong>จำนวน:</strong> ${quantity} ชิ้น</p>
+                        <p style="margin-bottom: 10px;"><strong>ราคา/ชิ้น:</strong> ฿${currentProduct.price.toLocaleString()}</p>
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                        <p style="font-size: 1.2rem;"><strong>รวมทั้งหมด:</strong> <span style="color: #22c55e;">฿${totalPrice.toLocaleString()}</span></p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#14b8a6',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(`/api/products/${currentProduct.product_id}/purchase`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quantity: quantity })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    if (data.delivery && data.delivery.length > 0) {
+                        const keys = data.delivery.join('\n');
+                        const keysEscaped = keys.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                        const keyCount = data.delivery.length;
+                        await Swal.fire({
+                            icon: 'success',
+                            title: '🎉 ซื้อสำเร็จ!',
+                            html: `
+                                <div style="text-align: center;">
+                                    <p style="color: #5eead4; font-size: 1.1rem; margin-bottom: 5px;">${currentProduct.name}</p>
+                                    <p style="color: #a7c4bc; font-size: 0.9rem; margin-bottom: 20px;">จำนวน ${keyCount} ชิ้น</p>
+                                    
+                                    <div style="background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(0,0,0,0.3)); padding: 20px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.3); margin-bottom: 20px;">
+                                        <p style="color: #a7c4bc; margin-bottom: 12px; font-size: 0.9rem;">
+                                            <span style="font-size: 1.2rem;">🔑</span> Key/Code ของคุณ (${keyCount} รายการ):
+                                        </p>
+                                        <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 8px; font-family: 'Fira Code', 'Consolas', monospace; font-size: ${keyCount > 3 ? '0.85rem' : '1rem'}; color: #5eead4; word-break: break-all; white-space: pre-wrap; text-align: left; border: 1px solid rgba(255,255,255,0.1); max-height: 250px; overflow-y: auto;" id="keyDisplay">${keys}</div>
+                                        <button onclick="navigator.clipboard.writeText('${keysEscaped}'); this.innerHTML='✅ คัดลอกแล้ว!'; this.style.background='rgba(34,197,94,0.2)'; this.style.borderColor='#22c55e';" style="margin-top: 12px; background: rgba(20,184,166,0.2); border: 1px solid #14b8a6; padding: 10px 25px; border-radius: 8px; color: #5eead4; cursor: pointer; font-family: 'Kanit', sans-serif; transition: all 0.3s; font-size: 0.9rem;">
+                                            <i class="fa-solid fa-copy"></i> คัดลอกทั้งหมด
+                                        </button>
+                                    </div>
+                                    
+                                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(34,197,94,0.1); border-radius: 8px; border: 1px solid rgba(34,197,94,0.3);">
+                                        <span style="font-size: 1.3rem;">💰</span>
+                                        <span style="color: #a7c4bc;">ยอดเงินคงเหลือ:</span>
+                                        <span style="color: #22c55e; font-weight: 600; font-size: 1.1rem;">฿${data.newBalance.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            `,
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#14b8a6',
+                            background: 'linear-gradient(135deg, #0a1612 0%, #1a2f2a 100%)',
+                            color: '#fff',
+                            width: keyCount > 1 ? '600px' : 'auto',
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInUp animate__faster'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutDown animate__faster'
+                            }
+                        });
+                    } else {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: '🎉 ซื้อสำเร็จ!',
+                            html: `
+                                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(34,197,94,0.1); border-radius: 8px; border: 1px solid rgba(34,197,94,0.3);">
+                                    <span style="font-size: 1.3rem;">💰</span>
+                                    <span style="color: #a7c4bc;">ยอดเงินคงเหลือ:</span>
+                                    <span style="color: #22c55e; font-weight: 600; font-size: 1.1rem;">฿${data.newBalance.toFixed(2)}</span>
+                                </div>
+                            `,
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#14b8a6',
+                            background: 'linear-gradient(135deg, #0a1612 0%, #1a2f2a 100%)',
+                            color: '#fff'
+                        });
+                    }
+                    
+                    // Reload to update stock
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: data.error || 'ไม่สามารถซื้อสินค้าได้',
+                        confirmButtonColor: '#14b8a6'
+                    });
+                }
+            } catch (error) {
+                console.error('Purchase error:', error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+                    confirmButtonColor: '#14b8a6'
+                });
+            }
+        }
+
+        // Quantity functions
+        function changeQuantity(delta) {
+            const input = document.getElementById('quantityInput');
+            let value = parseInt(input.value) || 1;
+            value += delta;
+            
+            const min = 1;
+            const max = Math.min(currentProduct?.stock || 100, 100);
+            
+            if (value < min) value = min;
+            if (value > max) value = max;
+            
+            input.value = value;
+            updateTotalPrice();
+            updateQuantityButtons();
+        }
+
+        function validateQuantity() {
+            const input = document.getElementById('quantityInput');
+            let value = parseInt(input.value) || 1;
+            
+            const min = 1;
+            const max = Math.min(currentProduct?.stock || 100, 100);
+            
+            if (value < min) value = min;
+            if (value > max) value = max;
+            
+            input.value = value;
+            updateTotalPrice();
+            updateQuantityButtons();
+        }
+
+        function updateTotalPrice() {
+            if (!currentProduct) return;
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+            const total = currentProduct.price * quantity;
+            document.getElementById('totalPrice').textContent = '฿' + total.toLocaleString();
+        }
+
+        function updateQuantityButtons() {
+            const input = document.getElementById('quantityInput');
+            const value = parseInt(input.value) || 1;
+            const max = Math.min(currentProduct?.stock || 100, 100);
+            
+            document.getElementById('btnMinus').disabled = value <= 1;
+            document.getElementById('btnPlus').disabled = value >= max;
+        }
+
+        // Show More Info
+        function showMoreInfo() {
+            const detailsSection = document.querySelector('.product-details-section');
+            detailsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize
+        loadProductData();
+        
+        // Auto-refresh polling ทุก 3 วินาที
+        let refreshInterval;
+        async function refreshProductData() {
+            const { id } = getUrlParams();
+            if (!id) return;
+            
+            try {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                
+                if (data.success && data.products) {
+                    const product = data.products.find(p => p.product_id === id);
+                    
+                    if (product) {
+                        currentProduct = product;
+                        renderProduct();
+                    } else {
+                        // สินค้าถูกลบแล้ว - redirect กลับไปหน้า store
+                        clearInterval(refreshInterval);
+                        await Swal.fire({
+                            icon: 'warning',
+                            title: 'สินค้านี้ไม่มีแล้ว',
+                            text: 'สินค้านี้ถูกลบออกจากระบบแล้ว',
+                            confirmButtonColor: '#14b8a6'
+                        });
+                        window.location.href = '/pages/store.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Auto-refresh error:', error);
+            }
+        }
+        
+        function startAutoRefresh() {
+            refreshInterval = setInterval(refreshProductData, 3000); // Refresh ทุก 3 วินาที
+        }
+        
+        // หยุด refresh เมื่อออกจากหน้า
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+        });
+        
+        // Refresh เมื่อ focus กลับมาที่หน้าต่าง
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                refreshProductData();
+            }
+        });
+        
+        // เริ่ม auto-refresh
+        startAutoRefresh();
+
+        // Hide loading screen
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && loadingScreen.style.display !== 'none') {
+                setTimeout(function() {
+                    loadingScreen.classList.add('hide');
+                    setTimeout(function() {
+                        loadingScreen.remove();
+                    }, 300);
+                }, 800);
+            } else if (loadingScreen) {
+                loadingScreen.remove();
+            }
+        });
+    </script>
+</body>
+</html>

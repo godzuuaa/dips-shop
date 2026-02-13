@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สินค้า - Dips Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+
+    <style>
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .infinity-loader {
+            width: 80px;
+            height: 50px;
+        }
+        .infinity-loader svg {
+            width: 100%;
+            height: 100%;
+        }
+        .infinity-loader path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawInfinity 2s ease-in-out infinite;
+        }
+        @keyframes drawInfinity {
+            0% { stroke-dashoffset: 200; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -200; }
+        }
+        .loading-logo {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+        .loading-logo .dips { color: white; }
+        .loading-logo .hub { color: #14b8a6; }
+        .loading-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #14b8a6, #5eead4);
+            width: 0%;
+            animation: loadProgress 1.5s ease-in-out forwards;
+        }
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('../images/24678.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .bg-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .nav-brand .dips { color: white; }
+        .nav-brand .hub { color: #14b8a6; }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #5eead4;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 50px;
+        }
+
+        .content-wrapper {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            width: 45px;
+            height: 45px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(20, 184, 166, 0.2);
+            border-color: #14b8a6;
+            transform: translateX(-5px);
+        }
+
+        .page-title h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .page-title .white { color: white; }
+        .page-title .teal { 
+            color: #14b8a6;
+            background: linear-gradient(135deg, #14b8a6, #5eead4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-title p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* Category Badge */
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(20, 184, 166, 0.15);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            border-radius: 30px;
+            color: #5eead4;
+            font-size: 0.9rem;
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(20, 184, 166, 0.5);
+            box-shadow: 0 25px 60px rgba(20, 184, 166, 0.2);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
+        }
+
+        .product-badge.hot {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .product-badge.new {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .product-content {
+            padding: 25px;
+        }
+
+        .product-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+        }
+
+        .product-card:hover .product-name {
+            color: #5eead4;
+        }
+
+        .product-description {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .product-meta i {
+            color: #14b8a6;
+        }
+
+        .product-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #5eead4;
+        }
+
+        .product-price .currency {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-buy {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-buy:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(20, 184, 166, 0.4);
+        }
+
+        .btn-buy:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Stock Status */
+        .stock-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
+
+        .stock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+
+        .stock-dot.low {
+            background: #f59e0b;
+        }
+
+        .stock-dot.out {
+            background: #ef4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stock-text {
+            color: #22c55e;
+        }
+
+        .stock-text.low {
+            color: #f59e0b;
+        }
+
+        .stock-text.out {
+            color: #ef4444;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .empty-state p {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: rgba(20, 184, 166, 0.5);
+            color: #5eead4;
+        }
+
+        .filter-btn.active {
+            background: rgba(20, 184, 166, 0.2);
+            border-color: #14b8a6;
+            color: #5eead4;
+        }
+
+        /* Skeleton Loading */
+        .skeleton-card {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes skeletonPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+
+        .skeleton-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%);
+            background-size: 200% 100%;
+            animation: skeletonShimmer 1.5s infinite;
+        }
+
+        @keyframes skeletonShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-content {
+            padding: 25px;
+        }
+
+        .skeleton-title {
+            height: 24px;
+            width: 70%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .skeleton-text {
+            height: 16px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        .skeleton-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .skeleton-price {
+            height: 32px;
+            width: 100px;
+            background: rgba(94, 234, 212, 0.2);
+            border-radius: 4px;
+        }
+
+        .skeleton-button {
+            height: 44px;
+            width: 120px;
+            background: rgba(20, 184, 166, 0.2);
+            border-radius: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .content-wrapper {
+                padding: 0 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen (จะถูกแสดงโดย JS ถ้าจำเป็น) -->
+    <div class="loading-screen" id="loadingScreen" style="display: none;">
+        <div class="infinity-loader">
+            <svg viewBox="0 0 100 50">
+                <path d="M25,25 C25,10 10,10 10,25 C10,40 25,40 25,25 C25,10 40,10 50,25 C60,40 75,40 75,25 C75,10 90,10 90,25 C90,40 75,40 75,25 C75,10 60,10 50,25 C40,40 25,40 25,25" />
+            </svg>
+        </div>
+        <div class="loading-logo">
+            <span class="dips">DIPS</span><span class="hub">HUB</span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+    <script>
+        // ตรวจสอบว่าควรแสดง loading หรือไม่
+        (function() {
+            const navEntries = performance.getEntriesByType('navigation');
+            const navType = navEntries.length > 0 ? navEntries[0].type : 'navigate';
+            
+            // แสดง loading เฉพาะตอน reload เท่านั้น
+            if (navType === 'reload') {
+                document.getElementById('loadingScreen').style.display = 'flex';
+            }
+        })();
+    </script>
+
+    <!-- Background -->
+    <div class="bg-wrapper">
+        <div class="bg-image"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-gear fa-spin" style="color: #14b8a6; font-size: 1.3rem;"></i>
+            <span><span class="dips">DIPS</span><span class="hub">HUB</span></span>
+        </a>
+        <div class="nav-links">
+            <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/pages/store.html" class="active"><i class="fa-solid fa-store"></i> Store</a>
+            <a href="/pages/topup.html"><i class="fa-regular fa-credit-card"></i> Topup</a>
+            <a href="#"><i class="fa-solid fa-list"></i> Features</a>
+            <a href="#"><i class="fa-solid fa-question"></i> How to</a>
+            <a href="#"><i class="fa-regular fa-newspaper"></i> News</a>
+        </div>
+        <div class="user-profile">
+            <!-- จะถูกอัพเดทโดย auth.js -->
+        </div>
+    </nav>
+
+    <!-- Initialize Category Info Early -->
+    <script>
+        // อ่าน category จาก URL และตั้งค่า title ทันที
+        (function() {
+            const categoryMeta = {
+                'tsunami-for-brainrots': { title: 'Tsunami For Brainrots', description: 'สินค้าและบริการทั้งหมดแมพ Escape Tsunami For Brainrots', icon: 'fa-water' },
+                'the-forge': { title: 'The Forge', description: 'สินค้าและบริการ The Forge', icon: 'fa-hammer' },
+                'blox-fruit': { title: 'Blox Fruit', description: 'สินค้าและบริการทั้งหมดแมพ Blox Fruit', icon: 'fa-apple-whole' },
+                'executor': { title: 'Dip Hub | Executor', description: 'Executor คุณภาพสูงสำหรับ Roblox', icon: 'fa-code' }
+            };
+            
+            const params = new URLSearchParams(window.location.search);
+            const category = (params.get('category') || 'tsunami-for-brainrots').toLowerCase().trim();
+            const meta = categoryMeta[category] || categoryMeta['tsunami-for-brainrots'];
+            
+            // เก็บไว้ใช้ตอน DOM โหลดเสร็จ
+            window.__initialCategory = { category, meta };
+        })();
+    </script>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <a href="/pages/store.html" class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                    <div class="page-title">
+                        <h1><span class="white">สินค้า</span> <span class="teal" id="categoryTitle"></span></h1>
+                        <p id="categoryDesc"></p>
+                    </div>
+                </div>
+                <div class="category-badge" id="categoryBadge">
+                    <i class="fa-solid fa-tag"></i>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">ทั้งหมด</button>
+                <button class="filter-btn" data-filter="instock">มีสินค้า</button>
+                <button class="filter-btn" data-filter="low">ใกล้หมด</button>
+                <button class="filter-btn" data-filter="price-low">ราคาต่ำ-สูง</button>
+                <button class="filter-btn" data-filter="price-high">ราคาสูง-ต่ำ</button>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <!-- Loading Skeleton -->
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                        <div class="skeleton-footer">
+                            <div class="skeleton-price"></div>
+                            <div class="skeleton-button"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                        <div class="skeleton-footer">
+                            <div class="skeleton-price"></div>
+                            <div class="skeleton-button"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                        <div class="skeleton-footer">
+                            <div class="skeleton-price"></div>
+                            <div class="skeleton-button"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        // ตั้งค่า title/description ทันทีจากข้อมูลที่เตรียมไว้
+        (function() {
+            if (window.__initialCategory) {
+                const { meta } = window.__initialCategory;
+                document.getElementById('categoryTitle').textContent = meta.title;
+                document.getElementById('categoryDesc').textContent = meta.description;
+                document.getElementById('categoryBadge').innerHTML = `<i class="fa-solid ${meta.icon}"></i><span>${meta.title}</span>`;
+                document.title = `${meta.title} - Dips Hub`;
+            }
+        })();
+        
+        // ข้อมูลสินค้า - จะถูกโหลดจาก API เป็นหลัก
+        // ถ้าไม่มีใน database จะใช้ default categories
+        let productsData = {};
+        
+        // Category metadata
+        const categoryMeta = {
+            'tsunami-for-brainrots': { title: 'Tsunami For Brainrots', description: 'สินค้าและบริการทั้งหมดแมพ Escape Tsunami For Brainrots', icon: 'fa-water' },
+            'the-forge': { title: 'The Forge', description: 'สินค้าและบริการ The Forge', icon: 'fa-hammer' },
+            'blox-fruit': { title: 'Blox Fruit', description: 'สินค้าและบริการทั้งหมดแมพ Blox Fruit', icon: 'fa-apple-whole' },
+            'executor': { title: 'Dip Hub | Executor', description: 'Executor คุณภาพสูงสำหรับ Roblox', icon: 'fa-code' },
+            'other': { title: 'สินค้าอื่นๆ', description: 'สินค้าและบริการอื่นๆ', icon: 'fa-box' }
+        };
+        
+        // สร้าง categoryMeta แบบ dynamic จาก category ที่ยังไม่มี
+        function getCategoryMeta(cat) {
+            if (categoryMeta[cat]) return categoryMeta[cat];
+            // สร้าง meta สำหรับ category ใหม่
+            const title = cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            return { title: title, description: `สินค้าและบริการ ${title}`, icon: 'fa-box' };
+        }
+
+        // โหลดสินค้าจาก API (Database)
+        async function loadProducts() {
+            try {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                
+                console.log('API Response:', data);
+                
+                if (data.success && data.products && data.products.length > 0) {
+                    // Clear และโหลดใหม่จาก database
+                    productsData = {};
+                    
+                    // แยกสินค้าตาม category
+                    data.products.forEach(product => {
+                        let cat = (product.category || 'executor').trim();
+                        
+                        // Normalize category name: แปลงเป็น lowercase และ replace ช่องว่างด้วย dash
+                        cat = cat.toLowerCase().replace(/\s+/g, '-');
+                        
+                        // สร้าง category ถ้ายังไม่มี
+                        if (!productsData[cat]) {
+                            const meta = getCategoryMeta(cat);
+                            productsData[cat] = {
+                                title: meta.title,
+                                description: meta.description,
+                                icon: meta.icon,
+                                products: []
+                            };
+                        }
+                        
+                        // เพิ่มสินค้าจาก database
+                        productsData[cat].products.push({
+                            id: product.product_id,
+                            name: product.name,
+                            description: product.description || '',
+                            price: parseFloat(product.price) || 0,
+                            image: product.image || '/images/1.jpg',
+                            badge: '',
+                            stock: product.stock || 0,
+                            sales: 0
+                        });
+                    });
+                    
+                    console.log('Products from DB:', productsData);
+                    return true; // มีข้อมูลจาก database
+                }
+                return false; // ไม่มีข้อมูลจาก database
+            } catch (error) {
+                console.error('Load products error:', error);
+                return false;
+            }
+        }
+        
+        // ใช้สินค้าตัวอย่าง (ถ้าไม่มีใน database)
+        function loadDefaultProducts() {
+            productsData = {
+                'tsunami-for-brainrots': {
+                    title: 'Tsunami For Brainrots',
+                    description: 'สินค้าและบริการทั้งหมดแมพ Escape Tsunami For Brainrots',
+                    icon: 'fa-water',
+                    products: []
+                },
+                'the-forge': {
+                    title: 'The Forge',
+                    description: 'สินค้าและบริการ The Forge',
+                    icon: 'fa-hammer',
+                    products: []
+                },
+                'blox-fruit': {
+                    title: 'Blox Fruit',
+                    description: 'สินค้าและบริการทั้งหมดแมพ Blox Fruit',
+                    icon: 'fa-apple-whole',
+                    products: []
+                },
+                'executor': {
+                    title: 'Dip Hub | Executor',
+                    description: 'Executor คุณภาพสูงสำหรับ Roblox',
+                    icon: 'fa-code',
+                    products: []
+                }
+            };
+        }
+
+        // ดึง category จาก URL
+        function getCategory() {
+            const params = new URLSearchParams(window.location.search);
+            const cat = params.get('category') || 'tsunami-for-brainrots';
+            // แปลงเป็นตัวพิมพ์เล็กเพื่อให้ตรงกับที่ normalize ใน loadProducts
+            return cat.toLowerCase().trim();
+        }
+
+        // แสดงสินค้า
+        function renderProducts(category) {
+            const data = productsData[category];
+            const grid = document.getElementById('productsGrid');
+            const title = document.getElementById('categoryTitle');
+            const desc = document.getElementById('categoryDesc');
+            const badge = document.getElementById('categoryBadge');
+
+            // ดึงข้อมูล category จาก getCategoryMeta (รองรับ category ใหม่)
+            const meta = getCategoryMeta(category);
+
+            // อัพเดท Header ด้วยข้อมูลจาก meta
+            title.textContent = meta.title;
+            desc.textContent = meta.description;
+            badge.innerHTML = `<i class="fa-solid ${meta.icon}"></i><span>${meta.title}</span>`;
+
+            // อัพเดท Title
+            document.title = `${meta.title} - Dips Hub`;
+
+            // ตรวจสอบว่ามีสินค้าหรือไม่
+            if (!data || data.products.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-box-open"></i>
+                        <h3>ไม่มีสินค้าในหมวดหมู่นี้</h3>
+                        <p>กรุณากลับมาใหม่ภายหลัง</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = data.products.map(product => {
+                const stockClass = product.stock === 0 ? 'out' : product.stock <= 5 ? 'low' : '';
+                const stockText = product.stock === 0 ? 'สินค้าหมด' : product.stock <= 5 ? `เหลือ ${product.stock} ชิ้น` : `มีสินค้า ${product.stock} ชิ้น`;
+                
+                return `
+                    <div class="product-card" data-stock="${product.stock}" data-price="${product.price}">
+                        <div class="product-image">
+                            <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/400x200/1a2f2a/14b8a6?text=${encodeURIComponent(product.name)}'">
+                            ${product.badge ? `<span class="product-badge ${product.badge}">${product.badge === 'hot' ? '🔥 ขายดี' : '✨ ใหม่'}</span>` : ''}
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-description">${product.description}</p>
+                            
+                            <div class="stock-status">
+                                <span class="stock-dot ${stockClass}"></span>
+                                <span class="stock-text ${stockClass}">${stockText}</span>
+                            </div>
+                            
+                            <div class="product-footer">
+                                <div class="product-price">
+                                    ${product.price === 0 ? 'ฟรี' : `฿${product.price.toLocaleString()}`}
+                                    ${product.price > 0 ? '<span class="currency">THB</span>' : ''}
+                                </div>
+                                <button class="btn-buy" onclick="viewProduct('${product.id}', '${getCategory()}')">
+                                    <i class="fa-solid fa-eye"></i>
+                                    ดูสินค้า
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ตรวจสอบ login status
+        let isUserLoggedIn = false;
+        
+        async function checkLoginStatus() {
+            try {
+                const res = await fetch('/api/user');
+                const data = await res.json();
+                isUserLoggedIn = data.loggedIn === true;
+                return isUserLoggedIn;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // ดูรายละเอียดสินค้า
+        function viewProduct(productId, category) {
+            window.location.href = `/pages/product-detail.html?id=${productId}&category=${category}`;
+        }
+
+        // ซื้อสินค้า
+        async function buyProduct(id, name, price) {
+            // ตรวจสอบ login ก่อน
+            const loggedIn = await checkLoginStatus();
+            if (!loggedIn) {
+                await showWarning('กรุณาเข้าสู่ระบบก่อนซื้อสินค้า', 'ต้อง Login ก่อน');
+                window.location.href = '/auth/discord';
+                return;
+            }
+
+            // ยืนยันการซื้อ
+            const result = await showConfirm(`ยืนยันซื้อ "${name}" ราคา ฿${price.toLocaleString()}?`, 'ยืนยันการซื้อ');
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/products/${id}/purchase`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quantity: 1 })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // แสดง Key ที่ได้รับ
+                    if (data.delivery && data.delivery.length > 0) {
+                        const keys = data.delivery.join('\n');
+                        showPurchaseSuccess(name, keys, data.newBalance);
+                    } else {
+                        showSuccess(`ซื้อสินค้าสำเร็จ!\n\nยอดเงินคงเหลือ: ฿${data.newBalance.toFixed(2)}`);
+                    }
+                    
+                    // รีโหลดหน้าเพื่ออัพเดท stock
+                    setTimeout(() => location.reload(), 3000);
+                } else {
+                    showError(data.error || 'เกิดข้อผิดพลาด');
+                }
+            } catch (error) {
+                console.error('Purchase error:', error);
+                showError('เกิดข้อผิดพลาดในการซื้อสินค้า');
+            }
+        }
+
+        // แสดง Popup ซื้อสำเร็จพร้อม Key
+        function showPurchaseSuccess(productName, keys, newBalance) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, #1a2f2a 0%, #0d1f1a 100%);
+                    border: 2px solid #14b8a6;
+                    border-radius: 20px;
+                    padding: 30px;
+                    max-width: 500px;
+                    width: 90%;
+                    text-align: center;
+                    animation: popIn 0.3s ease;
+                ">
+                    <div style="font-size:4rem;margin-bottom:15px;">🎉</div>
+                    <h2 style="color:#14b8a6;margin-bottom:10px;">ซื้อสำเร็จ!</h2>
+                    <p style="color:#a7c4bc;margin-bottom:20px;">${productName}</p>
+                    
+                    <div style="
+                        background: rgba(0,0,0,0.3);
+                        border: 1px solid rgba(20,184,166,0.3);
+                        border-radius: 10px;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                    ">
+                        <p style="color:#6b8a82;font-size:0.9rem;margin-bottom:10px;">
+                            <i class="fa-solid fa-key"></i> Key/Code ของคุณ:
+                        </p>
+                        <div style="
+                            background: rgba(0,0,0,0.5);
+                            padding: 15px;
+                            border-radius: 8px;
+                            font-family: monospace;
+                            font-size: 1.1rem;
+                            color: #5eead4;
+                            word-break: break-all;
+                            user-select: all;
+                        " id="keyDisplay">${keys}</div>
+                        <button onclick="copyKey('${keys.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" style="
+                            margin-top: 10px;
+                            background: linear-gradient(135deg, #14b8a6, #0d9488);
+                            border: none;
+                            padding: 10px 25px;
+                            border-radius: 8px;
+                            color: white;
+                            cursor: pointer;
+                            font-family: 'Kanit', sans-serif;
+                        ">
+                            <i class="fa-solid fa-copy"></i> คัดลอก Key
+                        </button>
+                    </div>
+                    
+                    <p style="color:#6b8a82;font-size:0.9rem;margin-bottom:20px;">
+                        💰 ยอดเงินคงเหลือ: <span style="color:#22c55e;">฿${newBalance.toFixed(2)}</span>
+                    </p>
+                    
+                    <div style="display:flex;gap:10px;justify-content:center;">
+                        <button onclick="this.closest('div').parentElement.remove()" style="
+                            background: rgba(255,255,255,0.1);
+                            border: 1px solid rgba(255,255,255,0.2);
+                            padding: 10px 25px;
+                            border-radius: 8px;
+                            color: white;
+                            cursor: pointer;
+                            font-family: 'Kanit', sans-serif;
+                        ">ปิด</button>
+                        <a href="/pages/purchases.html" style="
+                            background: linear-gradient(135deg, #14b8a6, #0d9488);
+                            border: none;
+                            padding: 10px 25px;
+                            border-radius: 8px;
+                            color: white;
+                            text-decoration: none;
+                            font-family: 'Kanit', sans-serif;
+                        ">ดูสินค้าที่ซื้อ</a>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+        }
+
+        // Copy key function
+        function copyKey(key) {
+            const text = key.replace(/\\n/g, '\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('คัดลอก Key สำเร็จ!', 'success');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('คัดลอก Key สำเร็จ!', 'success');
+            });
+        }
+
+        // Filter
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.dataset.filter;
+                const cards = document.querySelectorAll('.product-card');
+
+                cards.forEach(card => {
+                    card.style.display = 'block';
+                    card.style.animation = 'none';
+                    card.offsetHeight; // Trigger reflow
+                    card.style.animation = 'fadeIn 0.3s ease';
+                });
+
+                if (filter === 'instock') {
+                    cards.forEach(card => {
+                        if (parseInt(card.dataset.stock) === 0) {
+                            card.style.display = 'none';
+                        }
+                    });
+                } else if (filter === 'low') {
+                    cards.forEach(card => {
+                        const stock = parseInt(card.dataset.stock);
+                        if (stock === 0 || stock > 5) {
+                            card.style.display = 'none';
+                        }
+                    });
+                } else if (filter === 'price-low') {
+                    const grid = document.getElementById('productsGrid');
+                    const sorted = [...cards].sort((a, b) => parseInt(a.dataset.price) - parseInt(b.dataset.price));
+                    sorted.forEach(card => grid.appendChild(card));
+                } else if (filter === 'price-high') {
+                    const grid = document.getElementById('productsGrid');
+                    const sorted = [...cards].sort((a, b) => parseInt(b.dataset.price) - parseInt(a.dataset.price));
+                    sorted.forEach(card => grid.appendChild(card));
+                }
+            });
+        });
+
+        // Init
+        async function initPage() {
+            // โหลดสินค้าจาก API (Database)
+            const hasDbProducts = await loadProducts();
+            
+            // ถ้าไม่มีสินค้าใน database ให้ใช้ default
+            if (!hasDbProducts || Object.keys(productsData).length === 0) {
+                console.log('No products in DB, using defaults');
+                loadDefaultProducts();
+            }
+            
+            // แสดงสินค้าตาม category
+            const category = getCategory();
+            renderProducts(category);
+        }
+        
+        // Auto-refresh polling ทุก 3 วินาที
+        let refreshInterval;
+        async function refreshProducts() {
+            const hasDbProducts = await loadProducts();
+            if (!hasDbProducts || Object.keys(productsData).length === 0) {
+                loadDefaultProducts();
+            }
+            const category = getCategory();
+            renderProducts(category);
+        }
+        
+        function startAutoRefresh() {
+            refreshInterval = setInterval(refreshProducts, 3000); // Refresh ทุก 3 วินาที
+        }
+        
+        // หยุด refresh เมื่อออกจากหน้า
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+        });
+        
+        // Refresh เมื่อ focus กลับมาที่หน้าต่าง
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                refreshProducts();
+            }
+        });
+        
+        // เรียก init และเริ่ม auto-refresh
+        initPage();
+        startAutoRefresh();
+
+        // Hide loading screen
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && loadingScreen.style.display !== 'none') {
+                setTimeout(function() {
+                    loadingScreen.classList.add('hide');
+                    setTimeout(function() {
+                        loadingScreen.remove();
+                    }, 300);
+                }, 800);
+            } else if (loadingScreen) {
+                loadingScreen.remove();
+            }
+        });
+
+        // Animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    <script src="../js/sweetalert-config.js"></script>
+</body>
+</html>

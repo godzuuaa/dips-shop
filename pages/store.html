@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หมวดหมู่สินค้า - Dips Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/loading.css">
+    <script src="/js/loading.js"></script>
+
+    <style>
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .infinity-loader {
+            width: 80px;
+            height: 50px;
+        }
+        .infinity-loader svg {
+            width: 100%;
+            height: 100%;
+        }
+        .infinity-loader path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawInfinity 2s ease-in-out infinite;
+        }
+        @keyframes drawInfinity {
+            0% { stroke-dashoffset: 200; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -200; }
+        }
+        .loading-logo {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+        .loading-logo .dips { color: white; }
+        .loading-logo .hub { color: #14b8a6; }
+        .loading-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #14b8a6, #5eead4);
+            width: 0%;
+            animation: loadProgress 1.5s ease-in-out forwards;
+        }
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background เหมือน index */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('../images/24678.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .bg-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5); /* โปร่งใสเล็กน้อย */
+            backdrop-filter: blur(2px);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .nav-brand .dips {
+            color: white;
+        }
+
+        .nav-brand .hub {
+            color: #14b8a6;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #5eead4;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #a7c4bc;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            background: transparent;
+        }
+
+        /* Page Title */
+        .page-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .page-title .white {
+            color: white;
+        }
+
+        .page-title .red {
+            color: #14b8a6;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Category Card */
+        .category-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(94, 234, 212, 0.1);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(94, 234, 212, 0.4);
+            box-shadow: 0 10px 40px rgba(20, 184, 166, 0.2);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.3s;
+        }
+
+        .category-card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-content p {
+            color: #a7c4bc;
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(10, 22, 18, 0.9);
+            border: 1px solid #14b8a6;
+            border-radius: 8px;
+            color: #14b8a6;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: #14b8a6;
+            color: white;
+            box-shadow: 0 0 15px rgba(13, 148, 136, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .content-wrapper {
+                margin-left: 15px;
+                margin-right: 15px;
+                padding: 25px;
+            }
+
+            .page-title h1 {
+                font-size: 1.8rem;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen (จะถูกแสดงโดย JS ถ้าจำเป็น) -->
+    <div class="loading-screen" id="loadingScreen" style="display: none;">
+        <div class="infinity-loader">
+            <svg viewBox="0 0 100 50">
+                <path d="M25,25 C25,10 10,10 10,25 C10,40 25,40 25,25 C25,10 40,10 50,25 C60,40 75,40 75,25 C75,10 90,10 90,25 C90,40 75,40 75,25 C75,10 60,10 50,25 C40,40 25,40 25,25" />
+            </svg>
+        </div>
+        <div class="loading-logo">
+            <span class="dips">DIPS</span><span class="hub">HUB</span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+    <script>
+        // ตรวจสอบว่าควรแสดง loading หรือไม่
+        (function() {
+            const navEntries = performance.getEntriesByType('navigation');
+            const navType = navEntries.length > 0 ? navEntries[0].type : 'navigate';
+            
+            // แสดง loading เฉพาะตอน reload เท่านั้น
+            if (navType === 'reload') {
+                document.getElementById('loadingScreen').style.display = 'flex';
+            }
+        })();
+    </script>
+
+    <!-- Background -->
+    <div class="bg-wrapper">
+        <div class="bg-image"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-gear fa-spin" style="color: #14b8a6; font-size: 1.3rem;"></i>
+            <span><span class="dips">DIPS</span><span class="hub">HUB</span></span>
+        </a>
+        <div class="nav-links">
+            <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/pages/store.html" class="active"><i class="fa-solid fa-store"></i> Store</a>
+            <a href="/pages/topup.html"><i class="fa-regular fa-credit-card"></i> Topup</a>
+            <a href="#"><i class="fa-solid fa-list"></i> Features</a>
+            <a href="#"><i class="fa-solid fa-question"></i> How to</a>
+            <a href="#"><i class="fa-regular fa-newspaper"></i> News</a>
+        </div>
+        <div class="user-profile">
+            <!-- จะถูกอัพเดทโดย auth.js -->
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="page-title">
+                <h1><span class="white">หมวดหมู่</span> <span class="red">สินค้า</span></h1>
+            </div>
+
+            <div class="category-grid">
+                <!-- Category 1 -->
+                  <div class="category-card" onclick="goToCategory('Tsunami-for-brainrots')">
+                    <div class="card-image">
+                        <img src="/images/rent website banner.png" alt="Tsunami" onerror="this.src='https://via.placeholder.com/400x200/1a2f2a/14b8a6?text=Executor'">
+                    </div>
+                    <div class="card-content">
+                        <h3>สินค้าและบริการทั้งหมดแมพ Escape Tsunami For Brainrots</h3>
+                        <p>หมวดหมู่แนะนำสำหรับคุณ</p>
+                    </div>
+                </div>
+                <!-- Category 2 -->
+                <div class="category-card" onclick="goToCategory('The-Forge')">
+                    <div class="card-image">
+                        <img src="/images/1.jpg" alt="The Forge" onerror="this.src='https://via.placeholder.com/400x200/1a2f2a/14b8a6?text=The+Forge'">
+                    </div>
+                    <div class="card-content">
+                        <h3>สินค้าและบริการ The Forge</h3>
+                        <p>หมวดหมู่แนะนำสำหรับคุณ</p>
+                    </div>
+                </div>
+
+                <!-- Category 3 -->
+                <div class="category-card" onclick="goToCategory('Blox-Fruit')">
+                    <div class="card-image">
+                        <img src="/images/reset token banner.png" alt="Blox Fruit" onerror="this.src='https://via.placeholder.com/400x200/1a2f2a/14b8a6?text=Reset+HWID'">
+                    </div>
+                    <div class="card-content">
+                        <h3>สินค้าและบริการทั้งหมดแมพ Blox Fruit</h3>
+                        <p>หมวดหมู่แนะนำสำหรับคุณ</p>
+                    </div>
+                </div>
+
+                <!-- Category 4 -->
+                <div class="category-card" onclick="goToCategory('roblox-accounts-90days')">
+                    <div class="card-image">
+                        <img src="/images/id-gen.jpg" alt="roblox accounts" onerror="this.src='https://via.placeholder.com/400x200/1a2f2a/14b8a6?text=Reset+HWID'">
+                    </div>
+                    <div class="card-content">
+                        <h3>ID ROBLOX อายุ 90 วัน</h3>
+                        <p>หมวดหมู่แนะนำสำหรับคุณ</p>
+                    </div>
+                </div>
+                
+
+                <!-- Category 5 -->
+                <div class="category-card" onclick="goToCategory('Executor')">
+                    <div class="card-image">
+                        <img src="/images/Executor.jpg" alt="Executor" onerror="this.src='https://via.placeholder.com/400x200/1a2f2a/14b8a6?text=Rent+Website'">
+                    </div>
+                    <div class="card-content">
+                        <h3>Dip Hub | Executor</h3>
+                        <p>หมวดหมู่แนะนำสำหรับคุณ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Back Button -->
+    <a href="/" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>กลับหน้าหลัก</span>
+    </a>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        function goToCategory(category) {
+            window.location.href = `/pages/products.html?category=${category}`;
+        }
+        
+        // Hide loading screen when page is ready
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && loadingScreen.style.display !== 'none') {
+                setTimeout(function() {
+                    loadingScreen.classList.add('hide');
+                    setTimeout(function() {
+                        loadingScreen.remove();
+                    }, 300);
+                }, 800);
+            } else if (loadingScreen) {
+                loadingScreen.remove();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+/* ====================================
+   Dips Hub - Loading Screen
+   ==================================== */
+
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0a0f;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-screen.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Infinity Logo */
+.infinity-loader {
+    width: 80px;
+    height: 50px;
+    position: relative;
+}
+
+.infinity-loader svg {
+    width: 100%;
+    height: 100%;
+}
+
+.infinity-loader path {
+    fill: none;
+    stroke: #ef4444;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: drawInfinity 1s ease-in-out infinite;
+}
+
+@keyframes drawInfinity {
+    0% {
+        stroke-dashoffset: 200;
+    }
+    50% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: -200;
+    }
+}
+
+/* Loading Text */
+.loading-text {
+    margin-top: 30px;
+    color: #a7c4bc;
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Logo Text */
+.loading-logo {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-style: italic;
+}
+
+.loading-logo .dips {
+    color: white;
+}
+
+.loading-logo .hub {
+    color: #14b8a6;
+}
+
+/* Progress Bar (Optional) */
+.loading-progress {
+    width: 200px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 30px;
+    overflow: hidden;
+}
+
+.loading-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #14b8a6, #5eead4);
+    width: 0%;
+    animation: loadProgress 1.5s ease-in-out forwards;
+}
+
+@keyframes loadProgress {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
+}

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dips Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/loading.css">
+    <script src="/js/loading.js"></script>
+
+    <style>
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .infinity-loader {
+            width: 80px;
+            height: 50px;
+        }
+        .infinity-loader svg {
+            width: 100%;
+            height: 100%;
+        }
+        .infinity-loader path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawInfinity 2s ease-in-out infinite;
+        }
+        @keyframes drawInfinity {
+            0% { stroke-dashoffset: 200; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -200; }
+        }
+        .loading-logo {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-style: italic;
+        }
+        .loading-logo .dips { color: white; }
+        .loading-logo .hub { color: #14b8a6; }
+        .loading-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #14b8a6, #5eead4);
+            width: 0%;
+            animation: loadProgress 1.5s ease-in-out forwards;
+        }
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* ตั้งค่าพื้นฐาน */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: white;
+            overflow-x: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ส่วนของ Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5); /* โปร่งใสเล็กน้อย */
+            backdrop-filter: blur(2px);
+        }
+
+        .nav-brand img {
+            height: 30px; /* ปรับตามขนาดโลโก้จริง */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #5eead4;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #a7c4bc;
+            cursor: pointer;
+        }
+
+        /* Layout หลัก แบ่งหน้าจอ */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* ส่วนซ้าย: รูปภาพและโลโก้ใหญ่ */
+        .left-side {
+            width: 100%;
+            height: 100%;
+            /* ใส่ชื่อไฟล์รูปภาพของคุณตรงนี้ */
+            background-image: url('images/24678.jpg'); 
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Overlay ทำให้รูปมืดลงเล็กน้อยเพื่อให้ตัวหนังสือชัด */
+        .left-side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* โลโก้ Dips Hub ตรงกลางซ้าย */
+        .hero-title {
+            position: absolute;
+            z-index: 10;
+            font-weight: 800;
+            font-style: italic;
+            text-transform: uppercase;
+            left: 25%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 3s ease-in-out infinite;
+            text-align: center;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(-50%, -50%);
+            }
+            50% {
+                transform: translate(-50%, -55%);
+            }
+        }
+
+        .hero-title .white {
+            color: white;
+            font-size: 7rem;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.5),
+                0 0 40px rgba(255,255,255,0.1);
+            display: block;
+            letter-spacing: 5px;
+            line-height: 1;
+            margin-bottom: -25px;
+        }
+
+        .hero-title .tel {
+            color: transparent;
+            font-size: 3.8rem;
+            background: linear-gradient(135deg, #5eead4 0%, #14b8a6 50%, #0d9488 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: none;
+            display: block;
+            letter-spacing: 12px;
+            opacity: 0.85;
+            line-height: 1;
+            margin-left: 5px;
+        }
+
+        /* ส่วนขวา: เนื้อหาและปุ่ม */
+        .right-side {
+            width: 55%; /* ให้ซ้อนทับกันเล็กน้อย */
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* พื้นหลังโปร่งใส */
+            position: absolute;
+            right: 0;
+            top: 0;
+            /* สร้างมุมเฉียงด้วย clip-path */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+            display: flex;
+            align-items: center;
+            padding-left: 15%; /* ดันเนื้อหาให้พ้นส่วนเฉียง */
+            padding-right: 50px;
+        }
+
+        .content-box {
+            max-width: 500px;
+            color: #a7c4bc;
+        }
+
+        .content-box p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .btn-buy {
+            display: inline-block;
+            padding: 10px 30px;
+            border: 1px solid #0d9488;
+            color: #14b8a6;
+            text-decoration: none;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+            background: rgba(13, 148, 136, 0.1);
+            font-style: italic;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-5px);
+            border-color: rgba(94, 234, 212, 0.4);
+            box-shadow: 0 10px 40px rgba(20, 184, 166, 0.2);
+        }
+
+        /* ปุ่มปิด (X) ตรงกลาง */
+        .close-btn {
+            position: absolute;
+            top: 60px; /* ปรับตำแหน่งตามต้องการ */
+            left: 12%; /* ตำแหน่งเทียบกับกล่องขวา */
+            width: 30px;
+            height: 30px;
+            background: #1a2f2a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5eead4;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .left-side, .right-side {
+                width: 100%;
+                position: relative;
+                clip-path: none;
+            }
+            .right-side {
+                padding: 40px;
+                background: #0f1322;
+            }
+            .hero-title {
+                font-size: 4rem;
+            }
+            .navbar {
+                display: none; /* ซ่อนเมนูในมือถือแบบคร่าวๆ */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen (จะถูกแสดงโดย JS ถ้าจำเป็น) -->
+    <div class="loading-screen" id="loadingScreen" style="display: none;">
+        <div class="infinity-loader">
+            <svg viewBox="0 0 100 50">
+                <path d="M25,25 C25,10 10,10 10,25 C10,40 25,40 25,25 C25,10 40,10 50,25 C60,40 75,40 75,25 C75,10 90,10 90,25 C90,40 75,40 75,25 C75,10 60,10 50,25 C40,40 25,40 25,25" />
+            </svg>
+        </div>
+        <div class="loading-logo">
+            <span class="dips">DIPS</span><span class="hub">HUB</span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    </div>
+    <script>
+        // ตรวจสอบว่าควรแสดง loading หรือไม่
+        (function() {
+            const navEntries = performance.getEntriesByType('navigation');
+            const navType = navEntries.length > 0 ? navEntries[0].type : 'navigate';
+            const referrer = document.referrer;
+            const currentHost = window.location.host;
+            let showLoading = true;
+            
+            // ถ้าคลิกลิงก์มาจากเว็บเดียวกัน ไม่แสดง loading
+            if (referrer && navType === 'navigate') {
+                try {
+                    const referrerUrl = new URL(referrer);
+                    if (referrerUrl.host === currentHost) {
+                        showLoading = false;
+                    }
+                } catch (e) {}
+            }
+            
+            if (showLoading) {
+                document.getElementById('loadingScreen').style.display = 'flex';
+            }
+        })();
+    </script>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-gear fa-spin" style="color: #14b8a6; font-size: 1.3rem;"></i>
+            <span style="font-size: 1.3rem; font-weight: 800; font-style: italic;"><span style="color: white;">DIPS</span><span style="color: #14b8a6;">HUB</span></span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="active"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/pages/store.html"><i class="fa-solid fa-store"></i> Store</a>
+            <a href="/pages/topup.html"><i class="fa-regular fa-credit-card"></i> Topup</a>
+            <a href="#"><i class="fa-solid fa-list"></i> Features</a>
+            <a href="#"><i class="fa-solid fa-question"></i> How to</a>
+            <a href="#"><i class="fa-regular fa-newspaper"></i> News</a>
+        </div>
+        <div class="user-profile">
+            <!-- จะถูกอัพเดทโดย auth.js -->
+        </div>
+    </nav>
+
+    <div class="main-container">
+        
+        <div class="left-side">
+            <div class="hero-title">
+                <span class="white">Dips</span><br>
+                <span class="tel">Hub</span>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="close-btn"><i class="fa-solid fa-xmark"></i></div>
+
+            <div class="content-box">
+                <p>
+                    สคริปต์สำหรับมืออาชีพ สามารถนำไปใช้ได้หลากหลายฟังก์ชั่น<br>
+                    รวมถึงการทำไก่ตัน!! และมีสคริปต์มากกว่า 11 เกมส์ สคริปต์มีตัว<br>
+                    UnDetect ( ป้องกันการตรวจสอบจากเกม ) รับประกันว่าไม่โดน<br>
+                    แบน 100%
+                </p>
+                <a href="/pages/store.html" class="btn-buy">เลือกซื้อสินค้า</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Hide loading screen when page is ready
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && loadingScreen.style.display !== 'none') {
+                setTimeout(function() {
+                    loadingScreen.classList.add('hide');
+                    setTimeout(function() {
+                        loadingScreen.remove();
+                    }, 500);
+                }, 1500);
+            } else if (loadingScreen) {
+                loadingScreen.remove();
+            }
+        });
+    </script>
+</body>
+</html>

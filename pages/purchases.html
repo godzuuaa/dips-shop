@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สินค้าที่ซื้อ - Dips Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Purchases Page Styles */
+        .purchases-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+        }
+
+        /* Orders Grid */
+        .orders-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .order-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .order-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-id {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            font-family: monospace;
+        }
+
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .order-status.completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .order-status.pending {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .detail-value.price {
+            color: #14b8a6;
+        }
+
+        /* Delivery Section */
+        .delivery-section {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .delivery-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            color: #14b8a6;
+            font-weight: 600;
+        }
+
+        .delivery-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .delivery-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .delivery-key {
+            flex: 1;
+            color: #f1f5f9;
+            user-select: all;
+        }
+
+        .copy-btn {
+            background: rgba(20, 184, 166, 0.2);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            color: #14b8a6;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            background: rgba(20, 184, 166, 0.4);
+        }
+
+        .copy-btn.copied {
+            color: #22c55e;
+        }
+
+        /* No delivery message */
+        .no-delivery {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #475569;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h2 {
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+
+        .loading-spinner i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .page-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+            }
+
+            .order-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .delivery-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-icon">🎮</span>
+                <span class="logo-text">Dips Hub</span>
+            </a>
+            <div class="nav-menu">
+                <a href="store.html" class="nav-link">ร้านค้า</a>
+                <a href="topup.html" class="nav-link">เติมเงิน</a>
+                <a href="purchases.html" class="nav-link active">สินค้าที่ซื้อ</a>
+                <a href="transactions.html" class="nav-link">ประวัติ</a>
+            </div>
+            <div class="nav-auth" id="navAuth">
+                <a href="/auth/discord" class="btn btn-discord">
+                    <i class="fab fa-discord"></i> เข้าสู่ระบบ
+                </a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="purchases-container">
+        <div class="page-header">
+            <h1>📦 สินค้าที่ซื้อ</h1>
+            <p>ดู Key/Code ของสินค้าที่คุณซื้อไว้ทั้งหมด</p>
+        </div>
+
+        <div id="ordersContainer">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner"></i>
+                <p>กำลังโหลด...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Dips Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check auth and update nav
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/user');
+                const data = await res.json();
+                
+                if (data.loggedIn && data.user) {
+                    document.getElementById('navAuth').innerHTML = `
+                        <div class="user-info">
+                            <img src="${data.user.avatar || '/images/default-avatar.png'}" alt="Avatar" class="user-avatar">
+                            <span class="user-name">${data.user.username}</span>
+                            <a href="/logout" class="btn btn-outline btn-sm">ออก</a>
+                        </div>
+                    `;
+                    return true;
+                } else {
+                    // Redirect to login if not logged in
+                    window.location.href = '/auth/discord';
+                    return false;
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                return false;
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            try {
+                const res = await fetch('/api/orders');
+                const data = await res.json();
+
+                const container = document.getElementById('ordersContainer');
+
+                if (!data.success || !data.orders || data.orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-shopping-bag"></i></div>
+                            <h2>ยังไม่มีสินค้าที่ซื้อ</h2>
+                            <p>คุณยังไม่ได้ซื้อสินค้าใดๆ ไปเลือกซื้อสินค้าได้เลย!</p>
+                            <a href="store.html" class="btn btn-primary">
+                                <i class="fas fa-store"></i> ไปร้านค้า
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="orders-grid">
+                        ${data.orders.map(order => renderOrderCard(order)).join('')}
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Load orders error:', error);
+                document.getElementById('ordersContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h2>เกิดข้อผิดพลาด</h2>
+                        <p>ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
+                        <button onclick="loadOrders()" class="btn btn-primary">
+                            <i class="fas fa-redo"></i> ลองใหม่
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Render order card
+        function renderOrderCard(order) {
+            const date = new Date(order.created_at).toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const deliveryData = order.delivery_data;
+            const items = deliveryData?.items || [];
+
+            return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3>${order.product_name || 'ไม่ทราบชื่อสินค้า'}</h3>
+                            <div class="order-id">Order ID: ${order.order_id}</div>
+                        </div>
+                        <span class="order-status ${order.status}">${order.status === 'completed' ? 'สำเร็จ' : order.status}</span>
+                    </div>
+
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <div class="detail-label">จำนวน</div>
+                            <div class="detail-value">${order.quantity || 1} ชิ้น</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">ราคารวม</div>
+                            <div class="detail-value price">฿${parseFloat(order.total_price).toFixed(2)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">วันที่ซื้อ</div>
+                            <div class="detail-value">${date}</div>
+                        </div>
+                    </div>
+
+                    <div class="delivery-section">
+                        <div class="delivery-header">
+                            <i class="fas fa-key"></i>
+                            <span>Key / Code ของคุณ</span>
+                        </div>
+                        ${items.length > 0 ? `
+                            <div class="delivery-items">
+                                ${items.map((item, idx) => `
+                                    <div class="delivery-item">
+                                        <span class="delivery-key" id="key-${order.order_id}-${idx}">${item}</span>
+                                        <button class="copy-btn" onclick="copyKey('${order.order_id}-${idx}', this)" title="คัดลอก">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <p class="no-delivery">ไม่มีข้อมูล Key/Code</p>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Copy key function
+        function copyKey(keyId, button) {
+            const keyElement = document.getElementById('key-' + keyId);
+            const text = keyElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-copy"></i>';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-copy"></i>';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Mobile nav toggle
+        document.getElementById('navToggle')?.addEventListener('click', function() {
+            document.querySelector('.nav-menu')?.classList.toggle('active');
+        });
+
+        // Init
+        async function init() {
+            const isLoggedIn = await checkAuth();
+            if (isLoggedIn) {
+                await loadOrders();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
