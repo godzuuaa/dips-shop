@@ -201,7 +201,10 @@ const corsOptions = {
             process.env.FRONTEND_URL,
             // Railway production domains
             'https://dips-shop-production.up.railway.app',
-            'https://dips-shop-production-2fe7.up.railway.app'
+            'https://dips-shop-production-2fe7.up.railway.app',
+            // Custom domain
+            'https://dipshub.com',
+            'https://www.dipshub.com'
         ].filter(Boolean);
         
         // Also allow any .railway.app subdomain
