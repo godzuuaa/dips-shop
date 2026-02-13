@@ -198,10 +198,16 @@ const corsOptions = {
         const allowedOrigins = [
             'http://localhost:3000',
             'http://127.0.0.1:3000',
-            process.env.FRONTEND_URL
+            process.env.FRONTEND_URL,
+            // Railway production domains
+            'https://dips-shop-production.up.railway.app',
+            'https://dips-shop-production-2fe7.up.railway.app'
         ].filter(Boolean);
         
-        if (allowedOrigins.includes(origin)) {
+        // Also allow any .railway.app subdomain
+        const isRailwayDomain = origin && origin.endsWith('.railway.app');
+        
+        if (allowedOrigins.includes(origin) || isRailwayDomain) {
             callback(null, true);
         } else {
             console.warn(`⚠️  CORS blocked origin: ${origin}`);
